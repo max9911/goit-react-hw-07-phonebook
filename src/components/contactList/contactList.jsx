@@ -31,6 +31,7 @@ export default function ContactList({ arr, delBtn }) {
             name={elm.name}
             number={elm.number}
             delBtn={delBtn}
+            btnId={elm.id}
           />
         ))}
       </div>

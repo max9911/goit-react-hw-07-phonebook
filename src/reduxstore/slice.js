@@ -1,18 +1,25 @@
 import { createSlice, nanoid } from '@reduxjs/toolkit';
-const storageData = JSON.parse(localStorage.getItem('contacts'));
+
+import { getContactsThunk } from './thunk';
+
 const initialState = {
-  contactInfo: [
-    { id: 'id-1', name: 'Rosie Simpson', number: '459-12-56' },
-    { id: 'id-2', name: 'Hermione Kline', number: '443-89-12' },
-    { id: 'id-3', name: 'Eden Clements', number: '645-17-79' },
-    { id: 'id-4', name: 'Annie Copeland', number: '227-91-26' },
-  ],
+  contactInfo: [],
   filterName: null,
+  isLoading: false,
+  error: null,
 };
 
-if (storageData && storageData.length > 0) {
-  initialState.contactInfo = storageData;
-}
+const handlePending = state => {
+  state.isLoading = true;
+  state.error = '';
+};
+const handleRejected = (state, { payload }) => {
+  state.isLoading = false;
+  state.error = payload.message;
+};
+const handleFulfilled = state => {
+  state.isLoading = false;
+};
 
 const contactsSlice = createSlice({
   name: 'contactInfo',
@@ -23,7 +30,7 @@ const contactsSlice = createSlice({
 
       const newContact = { name, number, id: nanoid() };
 
-      const ifExist = contacts.find(
+      const ifExist = contacts?.find(
         el => el.name.toLowerCase() === name.toLowerCase()
       );
       if (ifExist) {
@@ -41,9 +48,28 @@ const contactsSlice = createSlice({
     deleteContact: (state, { payload }) => {
       const contacts = state.contactInfo;
 
-      state.contactInfo = contacts.filter(elm => elm.name !== payload);
+      state.contactInfo = contacts.filter(elm => elm.id !== payload);
       localStorage.setItem('contacts', JSON.stringify(state.contactInfo));
     },
+  },
+  extraReducers: builder => {
+    builder
+      .addCase(getContactsThunk.fulfilled, (state, { payload }) => {
+        state.contactInfo = payload;
+
+        // console.log('state', state.contactInfo);
+        // console.log('payload', payload);
+      })
+      .addMatcher(action => {
+        return action.type.endsWith('/pending');
+      }, handlePending)
+      .addMatcher(action => {
+        return action.type.endsWith('/rejected');
+      }, handleRejected)
+      .addMatcher(
+        action => action.type.endsWith('/fulfilled'),
+        handleFulfilled
+      );
   },
 });
 

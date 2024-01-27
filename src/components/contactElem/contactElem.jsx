@@ -1,11 +1,13 @@
-const ContactElem = ({ name, number, delBtn }) => {
+const ContactElem = ({ name, number, delBtn, btnId }) => {
   //   console.log(delBtn);
   return (
     <>
       <li>
         {name}: {number}
       </li>
-      <button onClick={() => delBtn(name)}>Delete contact</button>
+      <button id={btnId} onClick={delBtn}>
+        Delete contact
+      </button>
     </>
   );
 };
