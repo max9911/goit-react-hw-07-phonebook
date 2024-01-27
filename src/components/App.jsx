@@ -46,7 +46,7 @@ const App = () => {
       <h2>Contacts</h2>
       <Filter filter={filter} />
       {isLoading ? (
-        <h2>is Fetching</h2>
+        <h2>is P R O C E S S I N G . . . . </h2>
       ) : (
         contacts && <ContactList arr={contacts} delBtn={delBtn} />
       )}
